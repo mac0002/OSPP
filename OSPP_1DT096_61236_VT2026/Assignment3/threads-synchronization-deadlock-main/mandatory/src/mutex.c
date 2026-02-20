@@ -56,8 +56,7 @@ void *inc_no_sync(void *arg __attribute__((unused)))
 }
 
 /* Unsynchronized decrements of the shared counter variable */
-void *
-dec_no_sync(void *arg __attribute__((unused)))
+void *dec_no_sync(void *arg __attribute__((unused)))
 {
     int i;
 
@@ -73,8 +72,7 @@ dec_no_sync(void *arg __attribute__((unused)))
 *******************************************************************************/
 
 /* Increments of the shared counter should be protected by a mutex */
-void *
-inc_mutex(void *arg __attribute__((unused)))
+void *inc_mutex(void *arg __attribute__((unused)))
 {
     int i;
 
@@ -91,8 +89,7 @@ inc_mutex(void *arg __attribute__((unused)))
 }
 
 /* Decrements of the shared counter should be protected by a mutex */
-void *
-dec_mutex(void *arg __attribute__((unused)))
+void *dec_mutex(void *arg __attribute__((unused)))
 {
     int i;
 
@@ -230,7 +227,7 @@ typedef struct {
     double run_time;
 } thread_t;
 
-char * type2string(enum type type) {
+char *type2string(enum type type) {
     switch (type) {
     case inc: return "inc";
     case dec: return  "dec";
@@ -239,8 +236,7 @@ char * type2string(enum type type) {
 }
 
 /* The startroutine used by both increment and decrement threads. */
-void *
-generic_thread(void *_conf)
+void *generic_thread(void *_conf)
 {
     struct timespec ts;
     thread_t *conf = (thread_t *)_conf;
@@ -256,8 +252,7 @@ generic_thread(void *_conf)
 
 
 
-double
-print_stats(thread_t *threads, int nthreads, int niterations, test_t *test)
+double print_stats(thread_t *threads, int nthreads, int niterations, test_t *test)
 {
     double run_time_sum = 0;
     double average_execution_time = 0;
