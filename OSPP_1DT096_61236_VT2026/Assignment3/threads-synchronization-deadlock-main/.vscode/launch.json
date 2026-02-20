@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/marcuszhu/dv25/OSPP_1DT096_61236_VT2026/Assignment3/threads-synchronization-deadlock-main/mandatory/src",
+      "program": "/Users/marcuszhu/dv25/OSPP_1DT096_61236_VT2026/Assignment3/threads-synchronization-deadlock-main/mandatory/src/build/Debug/outDebug"
+    }
+  ]
+}
