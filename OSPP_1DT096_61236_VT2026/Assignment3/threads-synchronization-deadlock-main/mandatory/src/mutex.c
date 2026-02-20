@@ -56,7 +56,8 @@ void *inc_no_sync(void *arg __attribute__((unused)))
 }
 
 /* Unsynchronized decrements of the shared counter variable */
-void *dec_no_sync(void *arg __attribute__((unused)))
+void *
+dec_no_sync(void *arg __attribute__((unused)))
 {
     int i;
 
@@ -72,28 +73,35 @@ void *dec_no_sync(void *arg __attribute__((unused)))
 *******************************************************************************/
 
 /* Increments of the shared counter should be protected by a mutex */
-void *inc_mutex(void *arg __attribute__((unused)))
+void *
+inc_mutex(void *arg __attribute__((unused)))
 {
     int i;
 
     for (i = 0; i < INC_ITERATIONS; i++) {
         /* TODO: Protect access to the shared variable counter with a mutex lock
          * inside the loop. */
+        pthread_mutex_lock(&mutex);
         counter += INCREMENT;
+        pthread_mutex_unlock(&mutex);
+
     }
 
     return NULL;
 }
 
 /* Decrements of the shared counter should be protected by a mutex */
-void *dec_mutex(void *arg __attribute__((unused)))
+void *
+dec_mutex(void *arg __attribute__((unused)))
 {
     int i;
 
     for (i = 0; i < DEC_ITERATIONS; i++) {
         /* TODO: Protect access to the shared variable counter with a mutex lock
          * inside the loop. */
+        pthread_mutex_lock(&mutex);
         counter -= DECREMENT;
+        pthread_mutex_unlock(&mutex);
     }
 
     return NULL;
@@ -106,10 +114,14 @@ void *dec_mutex(void *arg __attribute__((unused)))
 
 void spin_lock() {
     /* TODO: Implement the lock operation for a test-and-set spinlock. */
+    while (__sync_lock_test_and_set(&lock, true)) {
+        // Just wait
+    }
 }
 
 void spin_unlock() {
     /* TODO: Implement the unlock operation for a test-and-set spinlock. */
+    __sync_lock_release(&lock);
 }
 
 /* Increments of the shared counter should be protected by a test-and-set spinlock */
@@ -119,7 +131,9 @@ void *inc_tas_spinlock(void *arg __attribute__((unused)))
 
     for (i = 0; i < INC_ITERATIONS; i++) {
         /* TODO: Add the spin_lock() and spin_unlock() operations inside the loop. */
+        spin_lock();
         counter += INCREMENT;
+        spin_unlock();
     }
 
     return NULL;
@@ -132,7 +146,9 @@ void *dec_tas_spinlock(void *arg __attribute__((unused)))
 
     for (i = 0; i < DEC_ITERATIONS; i++) {
         /* TODO: Add the spin_lock() and spin_unlock() operations inside the loop. */
+        spin_lock();
         counter -= DECREMENT;
+        spin_unlock();
     }
 
     return NULL;
@@ -150,8 +166,8 @@ void *inc_atomic(void *arg __attribute__((unused)))
 
     for (i = 0; i < INC_ITERATIONS; i++) {
         /* TODO: Use atomic addition to increment the shared counter */
-
-        counter += INCREMENT; // You need to replace this.
+        __sync_fetch_and_add(&counter, INCREMENT);
+        // counter += INCREMENT; // You need to replace this.
     }
 
     return NULL;
@@ -164,8 +180,8 @@ void *dec_atomic(void *arg __attribute__((unused)))
 
     for (i = 0; i < DEC_ITERATIONS; i++) {
         /* TODO: Use atomic subtraction to increment the shared counter */
-
-        counter -= DECREMENT; // You need to replace this.
+        __sync_fetch_and_sub(&counter, INCREMENT);
+        // counter -= DECREMENT; // You need to replace this.
     }
 
     return NULL;
@@ -214,7 +230,7 @@ typedef struct {
     double run_time;
 } thread_t;
 
-char *type2string(enum type type) {
+char * type2string(enum type type) {
     switch (type) {
     case inc: return "inc";
     case dec: return  "dec";
@@ -223,7 +239,8 @@ char *type2string(enum type type) {
 }
 
 /* The startroutine used by both increment and decrement threads. */
-void *generic_thread(void *_conf)
+void *
+generic_thread(void *_conf)
 {
     struct timespec ts;
     thread_t *conf = (thread_t *)_conf;
@@ -239,7 +256,8 @@ void *generic_thread(void *_conf)
 
 
 
-double print_stats(thread_t *threads, int nthreads, int niterations, test_t *test)
+double
+print_stats(thread_t *threads, int nthreads, int niterations, test_t *test)
 {
     double run_time_sum = 0;
     double average_execution_time = 0;
@@ -354,7 +372,8 @@ void run_test(test_t *test) {
 
 }
 
-int main()
+int
+main()
 {
     test_t *test = tests;
 
