@@ -25,10 +25,17 @@ account_t *account_new(unsigned int balance) {
 
   account->balance = balance;
 
+  if (pthread_mutex_init(&account->mutex, NULL) < 0) {
+  perror("Init mutex lock");
+  exit(EXIT_FAILURE);
+  }
+  
   return account;
 }
 
-void account_destroy(account_t *account) {}
+void account_destroy(account_t *account) {
+  
+}
 
 /**
  * A purposefully stupid way to add two numbers that makes data
@@ -54,8 +61,26 @@ int sub(int a, int b) {
   return result;
 }
 
+// Transfer function
 int transfer(int amount, account_t *from, account_t *to) {
-    if (from->balance >= amount) {
+
+  account_t *account_1;
+  account_t *account_2;
+
+  if (from < to) {
+    account_1 = to;
+    account_2 = from;
+    
+  }
+  if (to < from) {
+    account_1 = from;
+    account_2 = to;
+  }
+
+  pthread_mutex_lock(&account_1->mutex);
+  pthread_mutex_lock(&account_2->mutex);
+
+  if (from->balance >= amount) {
     from->balance = sub(from->balance, amount);
 
     /**
@@ -66,8 +91,14 @@ int transfer(int amount, account_t *from, account_t *to) {
 
     to->balance = add(to->balance, amount);
 
+    pthread_mutex_unlock(&account_1->mutex);
+    pthread_mutex_unlock(&account_2->mutex);
     return 0;
-  } else {
+  } else {    
+    pthread_mutex_unlock(&account_1->mutex);
+    pthread_mutex_unlock(&account_2->mutex);
     return -1;
-  }
+  }    
+
+
 }
