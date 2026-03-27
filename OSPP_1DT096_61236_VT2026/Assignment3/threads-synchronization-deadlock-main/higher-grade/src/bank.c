@@ -34,7 +34,8 @@ account_t *account_new(unsigned int balance) {
 }
 
 void account_destroy(account_t *account) {
-  
+  pthread_mutex_destroy(&account->mutex);
+  free(account);
 }
 
 /**

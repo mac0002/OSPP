@@ -147,4 +147,10 @@ int main(void) {
     print_accounts();
     sanity_check(init_sum);
   }
+
+  // Destroy the bank accounts.
+  for (int id = 0; id < N_ACCOUNTS; id++) {
+    account_destroy(accounts[id]);
+  }
+  
 }
