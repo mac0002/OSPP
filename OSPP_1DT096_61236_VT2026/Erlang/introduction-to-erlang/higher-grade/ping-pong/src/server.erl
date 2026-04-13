@@ -224,12 +224,18 @@ loop(Suped, Pairs) ->
             end;
         %% Handle the update, put and stop actions.
         {put, Ping, Pong, From} ->
-            NewPairs = maps:put(Ping, Pong, Pairs),
-            From ! {put, Ping, maps:get(Ping, NewPairs), ok},
-            loop(Suped, NewPairs);
+            case maps:find(Ping, Pairs) of 
+                {ok, _} ->
+                    From ! {put, Ping, maps:get(Ping, Pairs), ok},
+                    loop(Suped, maps:update(Ping, Pong, Pairs));
+                error -> 
+                    NewPairs = maps:put(Ping, Pong, Pairs),
+                    From ! {put, Ping, maps:get(Ping, NewPairs), ok},
+                    loop(Suped, NewPairs)
+            end;
         print ->
             [io:format("Current pairs: ~p => ~p~n", [K, V]) || {K, V} <- maps:to_list(Pairs)],
-            % io:format("Hot! Hot! HOT!~n"),
+            io:format("Hot! Hot! HOT!~n"),
             % From ! {print, Pairs},
             loop(Suped, Pairs);
         {stop, From} ->
